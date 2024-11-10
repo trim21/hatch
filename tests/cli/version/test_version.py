@@ -342,7 +342,7 @@ def test_show_static(hatch, temp_dir):
     assert result.output == '1.2.3\n'
 
 
-def test_set_static(hatch, helpers, temp_dir):
+def test_set_static(hatch, temp_dir):
     project_name = 'My.App'
 
     with temp_dir.as_cwd():
@@ -361,9 +361,8 @@ def test_set_static(hatch, helpers, temp_dir):
     with path.as_cwd(env_vars={ConfigEnvVars.DATA: str(data_path)}):
         result = hatch('version', 'minor,rc')
 
-    assert result.exit_code == 1, result.output
-    assert result.output == helpers.dedent(
-        """
-        Cannot set version when it is statically defined by the `project.version` field
-        """
-    )
+    assert result.exit_code == 0, result.output
+
+    project = Project(path)
+
+    assert project.raw_config['project']['version'] == '1.3.0rc0', 'should update static version'
